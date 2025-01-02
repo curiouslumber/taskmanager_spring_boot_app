@@ -20,6 +20,7 @@ public class TaskService  {
         task.setTitle(title);
         task.setDescription(description);
         task.setDeadline(deadlineFormatter.parse(deadline));
+        task.setCompleted(false);
         tasks.add(task);
         taskId++;
 

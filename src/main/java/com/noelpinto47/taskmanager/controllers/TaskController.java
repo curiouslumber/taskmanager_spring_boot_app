@@ -7,6 +7,7 @@ import com.noelpinto47.taskmanager.dto.CreateTaskDto;
 import com.noelpinto47.taskmanager.entities.TaskEntity;
 import com.noelpinto47.taskmanager.service.TaskService;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -45,9 +46,13 @@ public class TaskController {
 
     @PostMapping("")
     public ResponseEntity<TaskEntity> addTask(@RequestBody CreateTaskDto reqBody) {
-        TaskEntity task = taskService.addTask(reqBody.getTitle(), reqBody.getDescription(), reqBody.getDeadline());
-
-        return ResponseEntity.ok(task);
+        TaskEntity task;
+        try {
+            task = taskService.addTask(reqBody.getTitle(), reqBody.getDescription(), reqBody.getDeadline());
+            return ResponseEntity.ok(task);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
-    
 }

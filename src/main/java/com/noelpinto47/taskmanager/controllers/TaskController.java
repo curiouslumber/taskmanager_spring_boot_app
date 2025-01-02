@@ -3,7 +3,8 @@ package com.noelpinto47.taskmanager.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.noelpinto47.taskmanager.dto.CreateTaskDto;
+import com.noelpinto47.taskmanager.dto.CreateTaskDTO;
+import com.noelpinto47.taskmanager.dto.ErrorResponseDTO;
 import com.noelpinto47.taskmanager.entities.TaskEntity;
 import com.noelpinto47.taskmanager.service.TaskService;
 
@@ -11,6 +12,7 @@ import java.text.ParseException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,14 +47,18 @@ public class TaskController {
     }
 
     @PostMapping("")
-    public ResponseEntity<TaskEntity> addTask(@RequestBody CreateTaskDto reqBody) {
+    public ResponseEntity<TaskEntity> addTask(@RequestBody CreateTaskDTO reqBody) throws ParseException {
         TaskEntity task;
-        try {
-            task = taskService.addTask(reqBody.getTitle(), reqBody.getDescription(), reqBody.getDeadline());
-            return ResponseEntity.ok(task);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+        task = taskService.addTask(reqBody.getTitle(), reqBody.getDescription(), reqBody.getDeadline());
+        return ResponseEntity.ok(task);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponseDTO> handleParseException(Exception e) {
+        if(e instanceof ParseException) {
+            return ResponseEntity.badRequest().body(new ErrorResponseDTO("Invalid date format"));
         }
+        e.printStackTrace();
+        return ResponseEntity.internalServerError().build();
     }
 }
